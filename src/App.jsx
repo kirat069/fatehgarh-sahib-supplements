@@ -1,239 +1,69 @@
-import React, { useRef } from "react";
-import { Canvas } from "@react-three/fiber";
-import {
-  ScrollControls,
-  Scroll,
-  Environment,
-  ContactShadows,
-  Float,
-  OrbitControls,
-  useScroll,
-} from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import * as THREE from "three";
+import React from "react";
 
 import Nav from "./components/Nav";
-import Hero from "./components/Hero";
 import Benefits from "./components/Benefits";
 import Ingredients from "./components/Ingredients";
 import Reviews from "./components/Reviews";
 import Footer from "./components/Footer";
+import Bottle3D from "./components/Bottle3D";
 
-// ===================== Supplement Bottle =====================
-function SupplementBottle({ scrollData }) {
-  const bottleRef = useRef();
-  const capRef = useRef();
-  const labelRef = useRef();
-
-  useFrame((state) => {
-    if (!bottleRef.current) return;
-    const t = state.clock.elapsedTime;
-    const sf = scrollData?.current?.offset || 0;
-    const sections = 4;
-    const section = sf * sections;
-
-    bottleRef.current.position.y = 0.3 - section * 0.15 + Math.sin(t * 0.5) * 0.04;
-    bottleRef.current.position.x = Math.sin(section * 0.8) * 0.6;
-    bottleRef.current.rotation.y = section * Math.PI * 0.8 + t * 0.15;
-    bottleRef.current.rotation.z = Math.sin(section * 0.5) * 0.08;
-
-    if (capRef.current) {
-      capRef.current.rotation.y = bottleRef.current.rotation.y;
-      capRef.current.position.x = bottleRef.current.position.x;
-      capRef.current.position.y = bottleRef.current.position.y + 1.15;
-    }
-
-    if (labelRef.current) {
-      labelRef.current.rotation.y = bottleRef.current.rotation.y;
-      labelRef.current.position.x = bottleRef.current.position.x;
-      labelRef.current.position.y = bottleRef.current.position.y;
-    }
-  });
-
-  return (
-    <group ref={bottleRef}>
-      {/* Bottle body */}
-      <mesh castShadow receiveShadow>
-        <cylinderGeometry args={[0.7, 0.7, 2, 64, 1, false]} />
-        <meshPhysicalMaterial
-          color="#1A1D27"
-          metalness={0.3}
-          roughness={0.15}
-          clearcoat={1}
-          clearcoatRoughness={0.05}
-          reflectivity={0.6}
-          envMapIntensity={1.2}
-          transparent
-          opacity={0.92}
-        />
-      </mesh>
-
-      {/* Cap */}
-      <mesh ref={capRef} position={[0, 1.15, 0]} castShadow>
-        <cylinderGeometry args={[0.45, 0.45, 0.35, 32]} />
-        <meshPhysicalMaterial
-          color="#D4A857"
-          metalness={0.9}
-          roughness={0.2}
-          clearcoat={1}
-          clearcoatRoughness={0.1}
-          envMapIntensity={1.5}
-        />
-      </mesh>
-
-      {/* Gold accent rings */}
-      <mesh position={[0, -0.85, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.71, 0.015, 8, 64]} />
-        <meshStandardMaterial color="#D4A857" metalness={0.8} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, 0.85, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.71, 0.015, 8, 64]} />
-        <meshStandardMaterial color="#D4A857" metalness={0.8} roughness={0.3} />
-      </mesh>
-
-      {/* Label wrap */}
-      <mesh ref={labelRef}>
-        <cylinderGeometry args={[0.715, 0.715, 1.1, 64, 1, true]} />
-        <meshStandardMaterial
-          color="#0F1117"
-          roughness={0.6}
-          metalness={0.1}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-// ===================== Floating Particles =====================
-function FloatingParticles({ count = 25 }) {
-  const meshRef = useRef();
-  const dummy = useRef(new THREE.Object3D());
-  const particles = useRef(
-    Array.from({ length: count }, () => ({
-      position: [
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 6,
-        (Math.random() - 0.5) * 6 - 3,
-      ],
-      speed: 0.2 + Math.random() * 0.5,
-      offset: Math.random() * Math.PI * 2,
-      scale: 0.02 + Math.random() * 0.04,
-    }))
-  );
-
-  useFrame((state) => {
-    if (!meshRef.current) return;
-    const t = state.clock.elapsedTime;
-    particles.current.forEach((p, i) => {
-      const d = dummy.current;
-      d.position.set(
-        p.position[0] + Math.sin(t * p.speed + p.offset) * 0.4,
-        p.position[1] + Math.cos(t * p.speed * 0.7 + p.offset) * 0.5,
-        p.position[2]
-      );
-      d.scale.setScalar(p.scale);
-      d.updateMatrix();
-      meshRef.current.setMatrixAt(i, d.matrix);
-    });
-    meshRef.current.instanceMatrix.needsUpdate = true;
-  });
-
-  return (
-    <instancedMesh ref={meshRef} args={[null, null, count]}>
-      <sphereGeometry args={[1, 8, 8]} />
-      <meshStandardMaterial
-        color="#D4A857"
-        emissive="#D4A857"
-        emissiveIntensity={0.6}
-        transparent
-        opacity={0.5}
-      />
-    </instancedMesh>
-  );
-}
-
-// ===================== Scene Content =====================
-function SceneContent({ scrollRef }) {
-  const scrollData = useScroll();
-
-  useFrame(() => {
-    if (scrollRef) {
-      scrollRef.current = { offset: scrollData.offset };
-    }
-  });
-
-  return (
-    <>
-      <ambientLight intensity={0.3} />
-      <spotLight position={[5, 8, 5]} angle={0.3} intensity={1.2} color="#D4A857" castShadow />
-      <spotLight position={[-5, -2, 3]} angle={0.4} intensity={0.5} color="#E85D5D" />
-      <directionalLight position={[0, 5, 5]} intensity={0.4} />
-
-      <Float speed={1.2} rotationIntensity={0.15} floatIntensity={0.3}>
-        <SupplementBottle scrollData={scrollRef} />
-      </Float>
-
-      <FloatingParticles count={25} />
-
-      <ContactShadows
-        position={[0, -2.2, 0]}
-        opacity={0.3}
-        scale={8}
-        blur={2.5}
-        far={4}
-        color="#000000"
-      />
-
-      <Environment preset="studio" />
-
-      <OrbitControls
-        enablePan={false}
-        enableZoom={false}
-        minPolarAngle={Math.PI / 3}
-        maxPolarAngle={Math.PI / 1.8}
-        rotateSpeed={0.4}
-        makeDefault
-      />
-    </>
-  );
-}
-
-// ===================== Main App =====================
 export default function App() {
-  const scrollRef = useRef(null);
-
   return (
-    <div className="relative w-full bg-ink">
+    <div className="relative w-full bg-ink overflow-x-hidden">
       <Nav />
 
-      {/* Fixed 3D canvas behind content */}
-      <div className="fixed inset-0 z-0">
-        <Canvas
-          camera={{ position: [0, 0, 6], fov: 45 }}
-          dpr={[1, 1.5]}
-          gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
-          shadows
-        >
-          <ScrollControls pages={4} damping={0.3} distance={1}>
-            <SceneContent scrollRef={scrollRef} />
+      {/* Hero section with the 3D bottle in the center */}
+      <section
+        id="hero"
+        className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20"
+      >
+        {/* 3D bottle canvas — centered on screen */}
+        <div className="relative w-full max-w-2xl h-[50vh] sm:h-[60vh] z-10">
+          <Bottle3D />
+        </div>
 
-            {/* Scrollable HTML content layered over 3D */}
-            <Scroll html style={{ width: "100%" }}>
-              <div className="w-full">
-                <Hero />
-                <Benefits />
-                <Ingredients />
-                <Reviews />
-                <Footer />
-              </div>
-            </Scroll>
-          </ScrollControls>
-        </Canvas>
-      </div>
+        {/* Hero text content */}
+        <div className="text-center max-w-4xl mx-auto pt-8 z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 glass-panel rounded-full">
+            <span className="w-2 h-2 bg-coral rounded-full animate-pulse" />
+            <span className="text-xs font-mono tracking-widest text-ash uppercase">
+              Now Shipping Worldwide
+            </span>
+          </div>
 
-      {/* Spacer to enable native page scroll behind fixed canvas */}
-      <div style={{ height: "400vh" }} />
+          <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl leading-[0.95] mb-6 animate-fade-in">
+            Pure Potency.
+            <br />
+            <span className="text-gradient-gold">Proven Science.</span>
+          </h1>
+
+          <p
+            className="text-lg sm:text-xl text-ash max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-up"
+            style={{ animationDelay: "0.2s", opacity: 0 }}
+          >
+            Premium supplements crafted with clinically-dosed, science-backed
+            ingredients. No fillers, no fluff — just results you can feel.
+          </p>
+
+          <div
+            className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up"
+            style={{ animationDelay: "0.4s", opacity: 0 }}
+          >
+            <button className="px-8 py-4 bg-gold text-ink rounded-full font-semibold text-base hover:bg-gold-bright transition-all duration-200 hover:scale-105 glow-gold">
+              Shop Ojas — $48
+            </button>
+            <button className="px-8 py-4 border border-white/15 text-cream rounded-full font-semibold text-base hover:border-gold hover:text-gold transition-all duration-200">
+              Learn More
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Remaining sections — normal page flow */}
+      <Benefits />
+      <Ingredients />
+      <Reviews />
+      <Footer />
     </div>
   );
 }
