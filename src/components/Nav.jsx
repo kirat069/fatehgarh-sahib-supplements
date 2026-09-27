@@ -1,179 +1,81 @@
-import React, { useState } from "react";
-import { Phone, MessageCircle, Menu, X } from "lucide-react";
-import { STORE_INFO } from "../lib/supabase";
-import { useToast } from "./ToastContext";
+import React, { useState, useEffect } from "react";
+import { Menu, X } from "lucide-react";
 
 const navLinks = [
-  { id: "hero", label: "Home" },
-  { id: "products", label: "Products" },
-  { id: "tracking", label: "Track Order" },
-  { id: "team", label: "Team" },
-  { id: "contact", label: "Contact" },
+  { label: "Product", href: "#product" },
+  { label: "Benefits", href: "#benefits" },
+  { label: "Ingredients", href: "#ingredients" },
+  { label: "Reviews", href: "#reviews" },
 ];
 
 export default function Nav() {
+  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { showToast } = useToast();
 
-  const handleCall = async () => {
-    try {
-      await navigator.clipboard.writeText(STORE_INFO.phone);
-      showToast(`Number copied: ${STORE_INFO.phone}`);
-    } catch {
-      showToast(`Call: ${STORE_INFO.phone}`);
-    }
-  };
-
-  const scrollTo = (id) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    setMobileOpen(false);
-  };
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
     <nav
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        background: "rgba(20, 24, 28, 0.8)",
-        backdropFilter: "blur(12px)",
-        borderBottom: "1px solid var(--line)",
-      }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? "bg-ink/80 backdrop-blur-xl border-b border-white/5"
+          : "bg-transparent"
+      }`}
     >
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          padding: "14px 24px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <div
-          onClick={() => scrollTo("hero")}
-          style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 10 }}
-        >
-          <span
-            style={{
-              fontFamily: "'Oswald', sans-serif",
-              fontWeight: 700,
-              fontSize: 17,
-              color: "var(--amber)",
-              textTransform: "uppercase",
-              letterSpacing: 1,
-            }}
-          >
-            FSSD
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 flex items-center justify-between h-20">
+        <a href="#hero" className="flex items-center gap-2">
+          <span className="text-2xl font-display tracking-widest text-gradient-gold">
+            OJAS
           </span>
-          <span
-            className="mono nav-subtitle"
-            style={{ fontSize: 10, color: "var(--ink-soft)" }}
-          >
-            Fatehgarh Sahib
-          </span>
-        </div>
+        </a>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          <div className="nav-desktop" style={{ display: "flex", gap: 20 }}>
-            {navLinks.map((l) => (
-              <button
-                key={l.id}
-                onClick={() => scrollTo(l.id)}
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "var(--ink-soft)",
-                  cursor: "pointer",
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: 13,
-                  fontWeight: 500,
-                  transition: "color 0.2s",
-                }}
-                onMouseEnter={(e) => (e.target.style.color = "var(--amber)")}
-                onMouseLeave={(e) => (e.target.style.color = "var(--ink-soft)")}
-              >
-                {l.label}
-              </button>
-            ))}
-          </div>
-
-          <a
-            href={`tel:${STORE_INFO.phone}`}
-            onClick={handleCall}
-            className="btn btn-secondary nav-call-btn"
-            style={{ padding: "8px 16px", fontSize: 12 }}
-          >
-            <Phone size={14} /> Call
-          </a>
-          <a
-            href={`https://wa.me/${STORE_INFO.whatsapp}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary nav-wa-btn"
-            style={{ padding: "8px 16px", fontSize: 12 }}
-          >
-            <MessageCircle size={14} /> WhatsApp
-          </a>
-
-          <button
-            className="nav-mobile-toggle"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            style={{
-              display: "none",
-              background: "none",
-              border: "none",
-              color: "var(--ink)",
-              cursor: "pointer",
-            }}
-          >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className="text-sm font-medium text-ash hover:text-gold transition-colors duration-200 tracking-wide"
+            >
+              {link.label}
+            </a>
+          ))}
+          <button className="px-5 py-2.5 bg-gold text-ink rounded-full text-sm font-semibold hover:bg-gold-bright transition-all duration-200 hover:scale-105">
+            Shop Now
           </button>
         </div>
+
+        <button
+          className="md:hidden text-cream"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle menu"
+        >
+          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
       </div>
 
       {mobileOpen && (
-        <div
-          className="nav-mobile-menu"
-          style={{
-            background: "var(--surface)",
-            borderBottom: "1px solid var(--line)",
-            padding: "12px 24px",
-          }}
-        >
-          {navLinks.map((l) => (
-            <button
-              key={l.id}
-              onClick={() => scrollTo(l.id)}
-              style={{
-                display: "block",
-                width: "100%",
-                background: "none",
-                border: "none",
-                color: "var(--ink)",
-                cursor: "pointer",
-                fontFamily: "'Inter', sans-serif",
-                fontSize: 14,
-                fontWeight: 500,
-                padding: "10px 0",
-                textAlign: "left",
-                borderBottom: "1px solid var(--line)",
-              }}
-            >
-              {l.label}
+        <div className="md:hidden bg-ink/95 backdrop-blur-xl border-t border-white/5">
+          <div className="flex flex-col gap-1 px-6 py-4">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className="py-3 text-cream/80 hover:text-gold transition-colors text-sm font-medium border-b border-white/5"
+              >
+                {link.label}
+              </a>
+            ))}
+            <button className="mt-4 px-5 py-3 bg-gold text-ink rounded-full text-sm font-semibold">
+              Shop Now
             </button>
-          ))}
+          </div>
         </div>
       )}
-
-      <style>{`
-        @media (max-width: 768px) {
-          .nav-desktop { display: none !important; }
-          .nav-call-btn, .nav-wa-btn { display: none !important; }
-          .nav-subtitle { display: none !important; }
-          .nav-mobile-toggle { display: block !important; }
-        }
-      `}</style>
     </nav>
   );
 }

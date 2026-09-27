@@ -1,113 +1,57 @@
 import React from "react";
-import { Phone, MessageCircle, Package } from "lucide-react";
-import { STORE_INFO } from "../lib/supabase";
-import StoreFacts from "./StoreFacts";
+import { ArrowDown } from "lucide-react";
 
 export default function Hero() {
-  const facts = [
-    { label: "Genuine Stock", value: "100%" },
-    { label: "Batch Verified", value: "Every Order" },
-    { label: "Location", value: "Fatehgarh Sahib" },
-    { label: "Contact", value: STORE_INFO.phone },
-  ];
-
-  const scrollToProducts = () =>
-    document.getElementById("products")?.scrollIntoView({ behavior: "smooth" });
-
   return (
     <section
       id="hero"
-      className="grow-in"
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        maxWidth: 1200,
-        margin: "0 auto",
-        padding: "80px 24px 60px",
-      }}
+      className="relative min-h-screen flex flex-col items-center justify-center px-6 z-10"
     >
-      <div
-        className="hero-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1.2fr 0.8fr",
-          gap: 56,
-          alignItems: "center",
-          width: "100%",
-        }}
-      >
-        <div>
-          <div
-            className="mono"
-            style={{
-              color: "var(--amber)",
-              fontSize: 12,
-              marginBottom: 20,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
-            <span style={{ width: 24, height: 1, background: "var(--amber)" }} />
-            LOCAL SUPPLEMENT DEALER · FATEHGARH SAHIB
-          </div>
-          <h1
-            style={{
-              fontSize: "clamp(36px, 6vw, 64px)",
-              lineHeight: 1.02,
-              marginBottom: 24,
-              color: "var(--ink)",
-            }}
-          >
-            Know Exactly<br />
-            <span style={{ color: "var(--amber)" }}>What's In The Scoop.</span>
-          </h1>
-          <p
-            style={{
-              fontSize: 17,
-              lineHeight: 1.7,
-              color: "var(--ink-soft)",
-              maxWidth: 480,
-              marginBottom: 32,
-            }}
-          >
-            Genuine supplements, straight-up pricing. Every batch verified
-            with its lot number on the label. Based in Fatehgarh Sahib, Punjab —
-            call before you pay, pick up locally or get it delivered.
-          </p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <a href={`tel:${STORE_INFO.phone}`} className="btn btn-primary">
-              <Phone size={16} /> Call to Order
-            </a>
-            <a
-              href={`https://wa.me/${STORE_INFO.whatsapp}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-secondary"
-            >
-              <MessageCircle size={16} /> Order on WhatsApp
-            </a>
-            <button onClick={scrollToProducts} className="btn btn-secondary">
-              <Package size={16} /> View Stock
-            </button>
-          </div>
+      <div className="text-center max-w-4xl mx-auto pt-16">
+        <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 glass-panel rounded-full">
+          <span className="w-2 h-2 bg-coral rounded-full animate-pulse" />
+          <span className="text-xs font-mono tracking-widest text-ash uppercase">
+            Now Shipping Worldwide
+          </span>
         </div>
 
-        <div className="hero-facts">
-          <StoreFacts facts={facts} barPercent={100} barLabel="Trust Level" />
+        <h1 className="font-display text-5xl sm:text-7xl lg:text-8xl leading-[0.95] mb-6 animate-fade-in">
+          Pure Potency.
+          <br />
+          <span className="text-gradient-gold">Proven Science.</span>
+        </h1>
+
+        <p
+          className="text-lg sm:text-xl text-ash max-w-2xl mx-auto leading-relaxed mb-10 animate-fade-up"
+          style={{ animationDelay: "0.2s", opacity: 0 }}
+        >
+          Premium supplements crafted with clinically-dosed, science-backed
+          ingredients. No fillers, no fluff — just results you can feel.
+        </p>
+
+        <div
+          className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-up"
+          style={{ animationDelay: "0.4s", opacity: 0 }}
+        >
+          <button className="px-8 py-4 bg-gold text-ink rounded-full font-semibold text-base hover:bg-gold-bright transition-all duration-200 hover:scale-105 glow-gold">
+            Shop Ojas — $48
+          </button>
+          <button className="px-8 py-4 border border-white/15 text-cream rounded-full font-semibold text-base hover:border-gold hover:text-gold transition-all duration-200">
+            Learn More
+          </button>
         </div>
       </div>
 
-      <style>{`
-        @media (max-width: 768px) {
-          .hero-grid {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-          }
-          .hero-facts { max-width: 400px; }
-        }
-      `}</style>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+        <span className="text-xs font-mono tracking-widest text-ash uppercase">
+          Scroll to Explore
+        </span>
+        <ArrowDown
+          size={18}
+          className="text-gold animate-bounce"
+          aria-hidden="true"
+        />
+      </div>
     </section>
   );
 }
