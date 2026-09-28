@@ -5,7 +5,7 @@ import Benefits from "./components/Benefits";
 import Ingredients from "./components/Ingredients";
 import Reviews from "./components/Reviews";
 import Footer from "./components/Footer";
-import Bottle3D from "./components/Bottle3D";
+import BottleViewer from "./components/3DBottleViewer";
 
 export default function App() {
   return (
@@ -19,7 +19,7 @@ export default function App() {
       >
         {/* 3D bottle canvas — centered on screen */}
         <div className="relative w-full max-w-2xl h-[50vh] sm:h-[60vh] z-10">
-          <Bottle3D />
+          <BottleViewer />
         </div>
 
         {/* Hero text content */}
